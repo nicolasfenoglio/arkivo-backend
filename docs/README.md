@@ -154,7 +154,7 @@ erDiagram
 ```mermaid
 graph TD
   subgraph Cliente["Cliente"]
-    WEB["Aplicación Web\nNext.js PWA"]
+    WEB["Aplicación Web\nVite + React"]
   end
 
   subgraph Autenticacion["Autenticación"]
