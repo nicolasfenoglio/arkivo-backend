@@ -27,6 +27,10 @@ export class Subject extends Model<
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
+  declare departmentid: number;
+
+  @Attribute(DataTypes.INTEGER)
+  @NotNull
   declare level: number;
 
   @Attribute(DataTypes.STRING)

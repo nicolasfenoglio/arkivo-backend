@@ -4,13 +4,17 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
+  type NonAttribute,
 } from "@sequelize/core";
 import {
   Attribute,
   PrimaryKey,
   AutoIncrement,
   NotNull,
+  HasMany,
 } from "@sequelize/core/decorators-legacy";
+import { Download } from "./download.model.js";
+
 
 export class Resource extends Model<
   InferAttributes<Resource>,
@@ -44,4 +48,7 @@ export class Resource extends Model<
   @Attribute(DataTypes.STRING)
   @NotNull
   declare nombreOriginal: string;
+
+    @HasMany(() => Download, "recursoid")
+    declare downloads: NonAttribute<Download[]>;
 }

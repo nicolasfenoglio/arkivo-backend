@@ -17,6 +17,8 @@ import {
 import { Profile } from "./profile.model.js";
 import { Comment } from "./comment.model.js";
 import { Subject } from "./subject.model.js";
+import { Resource } from "./resource.model.js";
+import { Report } from "./report.model.js";
 
 export class Note extends Model<
   InferAttributes<Note>,
@@ -62,4 +64,10 @@ export class Note extends Model<
 
   @HasMany(() => Comment, "noteId")
   declare comments: NonAttribute<Comment[]>;
+
+  @HasMany(() => Resource, "apunteid")
+  declare resources: NonAttribute<Resource[]>;
+  
+  @HasMany(() => Report, "noteId")
+  declare reports: NonAttribute<Report[]>;
 }
