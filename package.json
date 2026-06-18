@@ -2,11 +2,12 @@
   "name": "arkivo-backend",
   "version": "1.0.0",
   "description": "Backend para la plataforma Arkivo, un sistema de gestión de apuntes académicos.",
-  "main": "./src/index.js",
   "type": "module",
+  "main": "./dist/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js --watch src",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "infra:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
     "infra:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "infra:restart": "docker compose -f docker-compose.yml -f docker-compose.dev.yml restart",
@@ -19,7 +20,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1071.0",
     "@aws-sdk/s3-request-presigner": "^3.1071.0",
-    "@sequelize/core": "7.0.0-alpha.42",
+    "@sequelize/core": "7.0.0-alpha.48",
     "@sequelize/postgres": "7.0.0-alpha.48",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -27,6 +28,9 @@
     "firebase-admin": "^14.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "^6.0.3"
   }
 }
