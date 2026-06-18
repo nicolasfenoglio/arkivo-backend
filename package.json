@@ -5,13 +5,16 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
-    "start": "docker compose up -d",
-    "dev": "nodemon . --watch src",
-    "infra:up": "docker compose up -d postgres minio minio-init",
-    "infra:down": "docker compose down",
-    "infra:restart": "docker compose restart",
-    "infra:logs": "docker compose logs -f",
-    "dev:full": "pnpm run infra:up && pnpm run dev"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js --watch src",
+    "infra:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "infra:down": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "infra:restart": "docker compose -f docker-compose.yml -f docker-compose.dev.yml restart",
+    "infra:logs": "docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f",
+    "dev:full": "pnpm run infra:up && pnpm run dev",
+    "docker:up": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
+    "docker:down": "docker compose -f docker-compose.yml -f docker-compose.prod.yml down",
+    "docker:logs": "docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1068.0",
