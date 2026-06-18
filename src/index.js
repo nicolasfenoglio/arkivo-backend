@@ -1,4 +1,6 @@
 import "dotenv/config";
+import app from "./app.js";
+import { initializeApp, applicationDefault } from "firebase-admin";
 
 [
   "S3_ENDPOINT",
@@ -15,7 +17,10 @@ import "dotenv/config";
 });
 
 const PORT = 3000;
-import app from "./app.js";
+
+initializeApp({
+  credential: applicationDefault(),
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
