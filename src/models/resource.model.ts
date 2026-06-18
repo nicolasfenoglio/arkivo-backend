@@ -15,7 +15,6 @@ import {
 } from "@sequelize/core/decorators-legacy";
 import { Download } from "./download.model.js";
 
-
 export class Resource extends Model<
   InferAttributes<Resource>,
   InferCreationAttributes<Resource>
@@ -49,6 +48,6 @@ export class Resource extends Model<
   @NotNull
   declare nombreOriginal: string;
 
-    @HasMany(() => Download, "recursoid")
-    declare downloads: NonAttribute<Download[]>;
+  @HasMany(() => Download, "recursoid")
+  declare downloads: NonAttribute<Download[]>;
 }
