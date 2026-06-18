@@ -33,15 +33,9 @@ export class Note extends Model<
   @NotNull
   declare authorId: CreationOptional<number>;
 
-  @HasOne(() => Profile, { sourceKey: "authorId", foreignKey: "id" })
-  declare author?: NonAttribute<Profile>;
-
   @Attribute(DataTypes.INTEGER)
   @NotNull
   declare subjectId: number;
-
-  @HasOne(() => Subject, { sourceKey: "subjectId", foreignKey: "id" })
-  declare subject?: NonAttribute<Subject>;
 
   @Attribute(DataTypes.STRING)
   @NotNull

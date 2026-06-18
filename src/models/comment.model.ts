@@ -27,9 +27,9 @@ export class Comment extends Model<
   @NotNull
   declare noteId: number;
 
-  @Attribute(DataTypes.STRING)
+  @Attribute(DataTypes.INTEGER)
   @NotNull
-  declare authorId: string;
+  declare authorId: number;
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
