@@ -1,5 +1,4 @@
 import {
-  Sequelize,
   DataTypes,
   Model,
   type InferAttributes,
@@ -11,7 +10,6 @@ import {
   PrimaryKey,
   AutoIncrement,
   NotNull,
-  Unique,
 } from "@sequelize/core/decorators-legacy";
 
 export class Subject extends Model<
@@ -30,7 +28,7 @@ export class Subject extends Model<
   @Attribute(DataTypes.INTEGER)
   @NotNull
   declare level: number;
-  
+
   @Attribute(DataTypes.STRING)
   @NotNull
   declare studyplan: string;

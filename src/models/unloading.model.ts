@@ -24,11 +24,10 @@ export class Subject extends Model<
   declare id: CreationOptional<number>;
 
   @Attribute(DataTypes.INTEGER)
-    @NotNull
+  @NotNull
   declare recursoid: CreationOptional<number>;
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
-  declare perfillid: number;
-
+  declare perfilid: number;
 }

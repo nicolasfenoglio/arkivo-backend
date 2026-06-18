@@ -1,5 +1,4 @@
 import {
-  Sequelize,
   DataTypes,
   Model,
   type InferAttributes,
@@ -11,7 +10,6 @@ import {
   PrimaryKey,
   AutoIncrement,
   NotNull,
-  Unique,
 } from "@sequelize/core/decorators-legacy";
 
 export class Subject extends Model<
@@ -24,7 +22,7 @@ export class Subject extends Model<
   declare id: CreationOptional<number>;
 
   @Attribute(DataTypes.INTEGER)
-    @NotNull
+  @NotNull
   declare autoid: CreationOptional<number>;
 
   @Attribute(DataTypes.INTEGER)

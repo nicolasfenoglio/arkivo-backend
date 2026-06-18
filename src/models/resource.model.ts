@@ -1,5 +1,4 @@
 import {
-  Sequelize,
   DataTypes,
   Model,
   type InferAttributes,
@@ -11,7 +10,6 @@ import {
   PrimaryKey,
   AutoIncrement,
   NotNull,
-  Unique,
 } from "@sequelize/core/decorators-legacy";
 
 export class Subject extends Model<
@@ -24,27 +22,26 @@ export class Subject extends Model<
   declare id: CreationOptional<number>;
 
   @Attribute(DataTypes.INTEGER)
-    @NotNull
+  @NotNull
   declare apunteid: CreationOptional<number>;
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
   declare materiaid: number;
 
-    @Attribute(DataTypes.STRING)
-    @NotNull
-    declare url: string;
+  @Attribute(DataTypes.STRING)
+  @NotNull
+  declare url: string;
 
-    @Attribute(DataTypes.STRING)
-    @NotNull
-    declare extension: string;
+  @Attribute(DataTypes.STRING)
+  @NotNull
+  declare extension: string;
 
-    @Attribute(DataTypes.INTEGER)
-    @NotNull
-    declare tamanioBytes: number;
+  @Attribute(DataTypes.INTEGER)
+  @NotNull
+  declare tamanioBytes: number;
 
-    @Attribute(DataTypes.STRING)
-    @NotNull
-    declare nombreOriginal: string;
-
+  @Attribute(DataTypes.STRING)
+  @NotNull
+  declare nombreOriginal: string;
 }
