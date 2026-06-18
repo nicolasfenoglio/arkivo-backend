@@ -4,3 +4,9 @@
  * En este archivo se importan y exportan todos los middlewares de la aplicación, lo que permite una gestión centralizada de ellos.
  * Al tener un punto único de importación para los middlewares, se mejora la organización del código y se facilita su mantenimiento.
  */
+
+export {
+  createSessionMiddleware,
+  sessionMiddleware,
+  guestSessionMiddleware,
+} from "./session.middleware.js";
