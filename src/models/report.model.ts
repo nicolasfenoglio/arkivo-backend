@@ -1,5 +1,4 @@
 import {
-  Sequelize,
   DataTypes,
   Model,
   type InferAttributes,
@@ -11,7 +10,6 @@ import {
   PrimaryKey,
   AutoIncrement,
   NotNull,
-  Unique,
 } from "@sequelize/core/decorators-legacy";
 
 export class Report extends Model<

@@ -14,9 +14,9 @@ import {
   Unique,
 } from "@sequelize/core/decorators-legacy";
 
-export class Subject extends Model<
-  InferAttributes<Subject>,
-  InferCreationAttributes<Subject>
+export class Download extends Model<
+  InferAttributes<Download>,
+  InferCreationAttributes<Download>
 > {
   @Attribute(DataTypes.INTEGER)
   @PrimaryKey

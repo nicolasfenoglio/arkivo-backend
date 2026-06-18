@@ -4,17 +4,23 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
+  type NonAttribute,
 } from "@sequelize/core";
 import {
   Attribute,
   PrimaryKey,
   AutoIncrement,
   NotNull,
+  HasOne,
+  HasMany,
 } from "@sequelize/core/decorators-legacy";
+import { Profile } from "./profile.model.js";
+import { Comment } from "./comment.model.js";
+import { Subject } from "./subject.model.js";
 
-export class Subject extends Model<
-  InferAttributes<Subject>,
-  InferCreationAttributes<Subject>
+export class Note extends Model<
+  InferAttributes<Note>,
+  InferCreationAttributes<Note>
 > {
   @Attribute(DataTypes.INTEGER)
   @PrimaryKey
@@ -23,11 +29,17 @@ export class Subject extends Model<
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
-  declare autoid: CreationOptional<number>;
+  declare authorId: CreationOptional<number>;
+
+  @HasOne(() => Profile, { sourceKey: "authorId", foreignKey: "id" })
+  declare author?: NonAttribute<Profile>;
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
-  declare materiaid: number;
+  declare subjectId: number;
+
+  @HasOne(() => Subject, { sourceKey: "subjectId", foreignKey: "id" })
+  declare subject?: NonAttribute<Subject>;
 
   @Attribute(DataTypes.STRING)
   @NotNull
@@ -35,7 +47,7 @@ export class Subject extends Model<
 
   @Attribute(DataTypes.STRING)
   @NotNull
-  declare descripcion: string;
+  declare description: string;
 
   @Attribute(DataTypes.STRING)
   @NotNull
@@ -43,8 +55,11 @@ export class Subject extends Model<
 
   @Attribute(DataTypes.STRING)
   @NotNull
-  declare thematicunit: string;
+  declare thematicUnit: string;
   @Attribute(DataTypes.BOOLEAN)
   @NotNull
   declare visible: boolean;
+
+  @HasMany(() => Comment, "noteId")
+  declare comments: NonAttribute<Comment[]>;
 }
