@@ -1,6 +1,7 @@
 import "dotenv/config";
 import app from "./app.js";
 import { initializeApp, applicationDefault } from "firebase-admin";
+import sequalize from "./models/index.js";
 
 [
   "S3_ENDPOINT",
@@ -21,6 +22,8 @@ const PORT = 3000;
 initializeApp({
   credential: applicationDefault(),
 });
+
+sequalize.sync({ alter: true });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

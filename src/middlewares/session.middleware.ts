@@ -1,6 +1,21 @@
+import type { Request, Response, NextFunction } from "express";
 import { getAuth } from "firebase-admin/auth";
+import type { DecodedIdToken } from "firebase-admin/auth";
 
-function getBearerToken(authorizationHeader) {
+declare global {
+  namespace Express {
+    interface Request {
+      user?: DecodedIdToken;
+      auth?: {
+        source: string;
+        authenticated: boolean;
+        token: string;
+      };
+    }
+  }
+}
+
+function getBearerToken(authorizationHeader?: string): string | null {
   const bearerPrefix = "Bearer ";
 
   if (!authorizationHeader?.startsWith(bearerPrefix)) {
@@ -11,7 +26,11 @@ function getBearerToken(authorizationHeader) {
   return token || null;
 }
 
-function setAuthenticatedSession(req, token, decodedToken) {
+function setAuthenticatedSession(
+  req: Request,
+  token: string,
+  decodedToken: DecodedIdToken,
+): void {
   req.user = decodedToken;
   req.auth = {
     source: "bearer",
@@ -21,7 +40,11 @@ function setAuthenticatedSession(req, token, decodedToken) {
 }
 
 export function createSessionMiddleware() {
-  return async function sessionMiddleware(req, res, next) {
+  return async function sessionMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void | Response> {
     const token = getBearerToken(req.headers.authorization);
 
     if (!token) {

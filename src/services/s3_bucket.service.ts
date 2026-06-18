@@ -14,21 +14,43 @@ const client = new S3Client({
   region: process.env.S3_REGION,
   forcePathStyle: true,
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY,
+    accessKeyId: process.env.S3_ACCESS_KEY!,
+    secretAccessKey: process.env.S3_SECRET_KEY!,
   },
 });
 
-const BUCKET = process.env.S3_BUCKET;
+const BUCKET = process.env.S3_BUCKET!;
+
+interface UploadUrlOptions {
+  noteUid: string;
+  filename: string;
+  contentType: string;
+  expiresIn?: number;
+}
+
+interface UploadUrlResponse {
+  key: string;
+  uploadUrl: string;
+}
+
+interface DownloadUrlOptions {
+  key: string;
+  expiresIn?: number;
+}
 
 class S3BucketService {
-  buildResourceKey(noteUid, filename) {
+  buildResourceKey(noteUid: string, filename: string): string {
     const id = crypto.randomUUID();
 
     return `notes/${noteUid}/${id}-${filename}`;
   }
 
-  async generateUploadUrl({ noteUid, filename, contentType, expiresIn = 900 }) {
+  async generateUploadUrl({
+    noteUid,
+    filename,
+    contentType,
+    expiresIn = 900,
+  }: UploadUrlOptions): Promise<UploadUrlResponse> {
     const key = this.buildResourceKey(noteUid, filename);
 
     const command = new PutObjectCommand({
@@ -47,7 +69,10 @@ class S3BucketService {
     };
   }
 
-  async generateDownloadUrl({ key, expiresIn = 900 }) {
+  async generateDownloadUrl({
+    key,
+    expiresIn = 900,
+  }: DownloadUrlOptions): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: BUCKET,
       Key: key,
@@ -58,7 +83,7 @@ class S3BucketService {
     });
   }
 
-  async exists(key) {
+  async exists(key: string): Promise<boolean> {
     try {
       await client.send(
         new HeadObjectCommand({
@@ -73,7 +98,7 @@ class S3BucketService {
     }
   }
 
-  async delete(key) {
+  async delete(key: string): Promise<void> {
     await client.send(
       new DeleteObjectCommand({
         Bucket: BUCKET,
@@ -84,3 +109,4 @@ class S3BucketService {
 }
 
 export default new S3BucketService();
+
