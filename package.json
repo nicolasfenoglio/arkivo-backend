@@ -17,14 +17,14 @@
     "docker:logs": "docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1068.0",
-    "@aws-sdk/s3-request-presigner": "^3.1068.0",
+    "@aws-sdk/client-s3": "^3.1071.0",
+    "@aws-sdk/s3-request-presigner": "^3.1071.0",
+    "@sequelize/core": "7.0.0-alpha.42",
     "@sequelize/postgres": "7.0.0-alpha.48",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
-    "firebase-admin": "^14.0.0",
-    "sequelize": "^6.37.8"
+    "firebase-admin": "^14.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
