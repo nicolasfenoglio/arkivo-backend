@@ -15,8 +15,8 @@ import {
 } from "@sequelize/core/decorators-legacy";
 
 export class Department extends Model<
-    InferAttributes<Department>,
-    InferCreationAttributes<Department>
+  InferAttributes<Department>,
+  InferCreationAttributes<Department>
 > {
   @Attribute(DataTypes.INTEGER)
   @PrimaryKey

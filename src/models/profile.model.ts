@@ -43,8 +43,8 @@ export class Profile extends Model<
   declare comments: NonAttribute<Comment[]>;
 
   @HasMany(() => Download, "perfilid")
-  declare downloads: NonAttribute<Download[]>;  
+  declare downloads: NonAttribute<Download[]>;
 
   @HasMany(() => Note, "authorId")
-  declare notes: NonAttribute<Note[]>;  
+  declare notes: NonAttribute<Note[]>;
 }

@@ -37,5 +37,5 @@ export class Subject extends Model<
   declare studyplan: string;
 
   @HasMany(() => Note, "subjectId")
-    declare notes: NonAttribute<Note[]>;  
+  declare notes: NonAttribute<Note[]>;
 }
