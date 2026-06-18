@@ -4,13 +4,16 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
+  type NonAttribute,
 } from "@sequelize/core";
 import {
   Attribute,
   PrimaryKey,
   AutoIncrement,
   NotNull,
+  HasMany,
 } from "@sequelize/core/decorators-legacy";
+import { Note } from "./note.model.js";
 
 export class Subject extends Model<
   InferAttributes<Subject>,
@@ -32,4 +35,7 @@ export class Subject extends Model<
   @Attribute(DataTypes.STRING)
   @NotNull
   declare studyplan: string;
+
+  @HasMany(() => Note, "subjectId")
+    declare notes: NonAttribute<Note[]>;  
 }

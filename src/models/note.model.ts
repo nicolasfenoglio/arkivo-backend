@@ -56,6 +56,7 @@ export class Note extends Model<
   @Attribute(DataTypes.STRING)
   @NotNull
   declare thematicUnit: string;
+  
   @Attribute(DataTypes.BOOLEAN)
   @NotNull
   declare visible: boolean;

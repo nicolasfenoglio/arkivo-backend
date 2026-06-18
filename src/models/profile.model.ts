@@ -4,6 +4,7 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
+  type NonAttribute,
 } from "@sequelize/core";
 import {
   Attribute,
@@ -11,7 +12,11 @@ import {
   AutoIncrement,
   NotNull,
   Unique,
+  HasMany,
 } from "@sequelize/core/decorators-legacy";
+import { Comment } from "./comment.model.js";
+import { Download } from "./download.model.js";
+import { Note } from "./note.model.js";
 
 export class Profile extends Model<
   InferAttributes<Profile>,
@@ -33,4 +38,13 @@ export class Profile extends Model<
 
   @Attribute(DataTypes.STRING)
   declare lastName: string | null;
+
+  @HasMany(() => Comment, "authorId")
+  declare comments: NonAttribute<Comment[]>;
+
+  @HasMany(() => Download, "perfilid")
+  declare downloads: NonAttribute<Download[]>;  
+
+  @HasMany(() => Note, "authorId")
+  declare notes: NonAttribute<Note[]>;  
 }
