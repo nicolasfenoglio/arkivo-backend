@@ -5,6 +5,7 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
+  type NonAttribute,
 } from "@sequelize/core";
 import {
   Attribute,
@@ -12,11 +13,12 @@ import {
   AutoIncrement,
   NotNull,
   Unique,
+  HasMany,
 } from "@sequelize/core/decorators-legacy";
-
+import { Subject } from "./subject.model.js";
 export class Department extends Model<
-    InferAttributes<Department>,
-    InferCreationAttributes<Department>
+  InferAttributes<Department>,
+  InferCreationAttributes<Department>
 > {
   @Attribute(DataTypes.INTEGER)
   @PrimaryKey
@@ -26,4 +28,7 @@ export class Department extends Model<
   @Attribute(DataTypes.STRING)
   @NotNull
   declare name: string;
+
+  @HasMany(() => Subject, "departmentid")
+  declare subjects: NonAttribute<Subject[]>;
 }
