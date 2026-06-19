@@ -7,6 +7,7 @@ import {
 import { Profile } from "../models/profile.model.js";
 import { body, validationResult } from "express-validator";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
+import { UniqueConstraintError } from "@sequelize/core";
 
 const validateProfileDate = [
   body("firstName")
@@ -75,10 +76,17 @@ router.post(
 
       return res.status(201).json({ id: profile.id });
     } catch (error) {
+      if (error instanceof UniqueConstraintError) {
+        return res.status(409).json({
+          error: "already_exists",
+          message: "Profile already exists",
+        });
+      }
+
       console.error(error);
       return res.status(500).json({
-        message: "Internal server error",
         error: "internal_server_error",
+        message: "Internal server error",
       });
     }
   },
