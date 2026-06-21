@@ -1,0 +1,36 @@
+info:
+  name: Register Account
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={{process.env.firebaseApiKey}}
+  params:
+    - name: key
+      value: "{{process.env.firebaseApiKey}}"
+      type: query
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{process.env.email}}",
+        "password": "{{process.env.password}}",
+        "returnSecureToken": true
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          bru.setVar("AccessToken", res.body["idToken"]);
+          bru.setVar("RefreshToken", res.body["refreshToken"])
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
