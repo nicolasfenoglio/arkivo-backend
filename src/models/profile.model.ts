@@ -33,6 +33,16 @@ export class Profile extends Model<
   declare authId: string;
 
   @Attribute(DataTypes.STRING)
+  @Unique
+  @NotNull
+  declare email: string;
+
+  @Attribute(DataTypes.STRING)
+  @Unique
+  @NotNull
+  declare username: string;
+
+  @Attribute(DataTypes.STRING)
   @NotNull
   declare firstName: string;
 

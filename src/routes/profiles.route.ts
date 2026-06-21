@@ -7,9 +7,21 @@ import {
 import { Profile } from "../models/profile.model.js";
 import { body, validationResult } from "express-validator";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
-import { UniqueConstraintError } from "@sequelize/core";
+import {
+  UniqueConstraintError,
+  type FindAttributeOptions,
+  type InferAttributes,
+} from "@sequelize/core";
 
-const validateProfileDate = [
+const validateProfileData = [
+  body("username")
+    .trim()
+    .notEmpty()
+    .withMessage("Username is required")
+    .isString()
+    .withMessage("Username must be a string")
+    .isLength({ max: 32 })
+    .withMessage("Username must be at most 32 characters long"),
   body("firstName")
     .trim()
     .notEmpty()
@@ -31,6 +43,21 @@ const validateProfileDate = [
   },
 ];
 
+const ownProfileProjection: FindAttributeOptions<InferAttributes<Profile>> = [
+  "id",
+  "username",
+  "email",
+  "firstName",
+  "lastName",
+];
+
+const profileProjection: FindAttributeOptions<InferAttributes<Profile>> = [
+  "id",
+  "username",
+  "firstName",
+  "lastName",
+];
+
 const router = Router();
 
 router.get("/@me", sessionMiddleware, async (req: Request, res: Response) => {
@@ -45,6 +72,8 @@ router.get("/@me", sessionMiddleware, async (req: Request, res: Response) => {
     where: {
       authId: user.uid,
     },
+    raw: true,
+    attributes: ownProfileProjection,
   });
 
   if (!profile) {
@@ -54,16 +83,39 @@ router.get("/@me", sessionMiddleware, async (req: Request, res: Response) => {
     });
   }
 
-  return res.json(profile.toJSON());
+  return res.json(profile);
+});
+
+router.get("/:id", sessionMiddleware, async (req: Request, res: Response) => {
+  const { user, params } = req;
+  if (!user || !user.uid)
+    return res.status(401).json({
+      message: "Unauthorized",
+      error: "missing_bearer_token",
+    });
+  const { id } = params;
+  const profile = await Profile.findOne({
+    where: {
+      id,
+    },
+    raw: true,
+    attributes: profileProjection,
+  });
+  if (!profile)
+    return res.status(404).json({
+      error: "not_found",
+      message: "Profile not found",
+    });
+  return res.json(profile);
 });
 
 router.post(
   "/",
   sessionMiddleware,
-  validateProfileDate,
+  validateProfileData,
   async (req: Request, res: Response) => {
     const { user, body } = req;
-    if (!user || !user.uid)
+    if (!user || !user.uid || !user.email)
       return res.status(401).json({
         message: "Unauthorized",
         error: "missing_bearer_token",
@@ -71,6 +123,7 @@ router.post(
     try {
       const profile = await Profile.create({
         authId: user.uid,
+        email: user.email,
         ...body,
       });
 
@@ -95,7 +148,7 @@ router.post(
 router.put(
   "/",
   sessionMiddleware,
-  validateProfileDate,
+  validateProfileData,
   async (req: Request, res: Response) => {
     const { user, body } = req;
     if (!user || !user.uid)
