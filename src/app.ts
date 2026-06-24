@@ -1,5 +1,6 @@
 import express from "express";
 import profileRouter from "./routes/profiles.route.js";
+import notesRouter from "./routes/notes.route.js";
 
 const app = express();
 
@@ -10,5 +11,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/profiles", profileRouter);
+app.use("/notes", notesRouter);
 
 export default app;
