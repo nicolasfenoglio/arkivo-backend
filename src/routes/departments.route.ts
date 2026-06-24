@@ -7,6 +7,7 @@ import {
 import { Department } from "../models/department.model.js";
 import { body, validationResult } from "express-validator";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
+import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
 
 const validateDepartmentData = [
   body("name")
@@ -50,7 +51,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   return res.json(department);
 });
 
-router.post("/",sessionMiddleware,validateDepartmentData, async (req: Request, res: Response) => {
+router.post("/",sessionMiddleware, profileRequiredMiddleware, validateDepartmentData, async (req: Request, res: Response) => {
     const { user } = req;
     if (!user || !user.uid)
       return res.status(401).json({
@@ -77,7 +78,7 @@ router.post("/",sessionMiddleware,validateDepartmentData, async (req: Request, r
   },
 );
 
-router.put("/:id",sessionMiddleware,validateDepartmentData, async (req: Request, res: Response) => {
+router.put("/:id",sessionMiddleware, profileRequiredMiddleware, validateDepartmentData, async (req: Request, res: Response) => {
     const { user } = req;
     if (!user || !user.uid)
       return res.status(401).json({
