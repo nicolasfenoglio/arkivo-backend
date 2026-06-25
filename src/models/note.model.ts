@@ -60,7 +60,7 @@ export class Note extends Model<
   @HasMany(() => Comment, "noteId")
   declare comments: NonAttribute<Comment[]>;
 
-  @HasMany(() => Resource, "apunteid")
+  @HasMany(() => Resource, "noteId")
   declare resources: NonAttribute<Resource[]>;
 
   @HasMany(() => Report, "noteId")

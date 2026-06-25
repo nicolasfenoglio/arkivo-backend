@@ -1,0 +1,28 @@
+info:
+  name: Create Note
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/notes"
+  headers:
+    - name: Authorization
+      value: Bearer {{AccessToken}}
+  body:
+    type: json
+    data: |-
+      {
+        "subjectId": 1,
+        "name": "Apunte Fisica 2",
+        "description": "Apunte de fisica 2 año 2025.",
+        "keywords": "Fisica, Fisica 2, Termodinamica, Carga Electrica, Campo Electrico, Potencial Electrico",
+        "thematicUnit": "Physics"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
