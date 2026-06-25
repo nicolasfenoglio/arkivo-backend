@@ -8,6 +8,7 @@ import { body, validationResult } from "express-validator";
 import { Note } from "../models/note.model.js";
 import { Profile } from "../models/profile.model.js";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
+import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
 
 const validateNoteData = [
   body("subjectId")
@@ -81,6 +82,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.post(
   "/",
   sessionMiddleware,
+  profileRequiredMiddleware,
   validateNoteData,
   async (req: Request, res: Response) => {
     const { user, body } = req;
@@ -125,6 +127,7 @@ router.post(
 router.put(
   "/:id",
   sessionMiddleware,
+  profileRequiredMiddleware,
   validateNoteData,
   async (req: Request, res: Response) => {
     const { user, body, params } = req;
@@ -183,6 +186,7 @@ router.put(
 router.delete(
   "/:id",
   sessionMiddleware,
+  profileRequiredMiddleware,
   async (req: Request, res: Response) => {
     const { user, params } = req;
 
