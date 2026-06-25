@@ -1,0 +1,37 @@
+info:
+  name: Create pre-sign URL
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/resources/presign/:noteId"
+  headers:
+    - name: Authorization
+      value: Bearer {{AccessToken}}
+  params:
+    - name: noteId
+      value: "2"
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "filename": "Fenoglio Nicolás - Curriculum Vitae.pdf",
+        "contentType": "application/pdf"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          bru.setVar("UploadLink", res.body["uploadUrl"])
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

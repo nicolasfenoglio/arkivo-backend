@@ -13,6 +13,7 @@ const client = new S3Client({
   endpoint: process.env.S3_ENDPOINT,
   region: process.env.S3_REGION,
   forcePathStyle: true,
+  requestChecksumCalculation: "WHEN_REQUIRED",
   credentials: {
     accessKeyId: process.env.S3_ACCESS_KEY!,
     secretAccessKey: process.env.S3_SECRET_KEY!,
@@ -22,7 +23,7 @@ const client = new S3Client({
 const BUCKET = process.env.S3_BUCKET!;
 
 interface UploadUrlOptions {
-  noteUid: string;
+  noteUid: number;
   filename: string;
   contentType: string;
   expiresIn?: number;
@@ -39,24 +40,20 @@ interface DownloadUrlOptions {
 }
 
 class S3BucketService {
-  buildResourceKey(noteUid: string, filename: string): string {
+  buildResourceKey(noteUid: number): string {
     const id = crypto.randomUUID();
-
-    return `notes/${noteUid}/${id}-${filename}`;
+    return `notes/${noteUid}/${id}`;
   }
 
   async generateUploadUrl({
     noteUid,
-    filename,
-    contentType,
     expiresIn = 900,
   }: UploadUrlOptions): Promise<UploadUrlResponse> {
-    const key = this.buildResourceKey(noteUid, filename);
+    const key = this.buildResourceKey(noteUid);
 
     const command = new PutObjectCommand({
       Bucket: BUCKET,
       Key: key,
-      ContentType: contentType,
     });
 
     const uploadUrl = await getSignedUrl(client, command, {
@@ -91,7 +88,6 @@ class S3BucketService {
           Key: key,
         }),
       );
-
       return true;
     } catch {
       return false;
@@ -109,4 +105,3 @@ class S3BucketService {
 }
 
 export default new S3BucketService();
-

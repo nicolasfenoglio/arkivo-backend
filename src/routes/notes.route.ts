@@ -110,7 +110,7 @@ router.post(
 
       const note = await Note.create({
         authorId: profile.id,
-        visible: body ?? true,
+        visible: body.visible || true,
         ...body,
       });
 
