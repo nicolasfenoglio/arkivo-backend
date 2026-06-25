@@ -42,8 +42,18 @@ const validatePresignData = [
   param("noteId")
     .isInt({ min: 1 })
     .withMessage("noteId must be a positive integer"),
-  body("filename").trim().withMessage("Filename must be a string"),
-  body("contentType").trim().withMessage("Content type must be a string"),
+  body("filename")
+    .trim()
+    .notEmpty()
+    .withMessage("Filename is required")
+    .isString()
+    .withMessage("Filename must be a string"),
+  body("contentType")
+    .trim()
+    .notEmpty()
+    .withMessage("contentType is required")
+    .isString()
+    .withMessage("contenType must be a string"),
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -182,3 +192,5 @@ router.post(
     }
   },
 );
+
+export default router;
