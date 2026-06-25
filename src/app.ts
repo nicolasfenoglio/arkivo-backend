@@ -1,6 +1,7 @@
 import express from "express";
 import profileRouter from "./routes/profiles.route.js";
 import departmentRouter from "./routes/departments.route.js";
+import commentRouter from "./routes/comments.route.js";
 
 const app = express();
 
@@ -12,5 +13,6 @@ app.get("/", (req, res) => {
 
 app.use("/profiles", profileRouter);
 app.use("/departments", departmentRouter);
+app.use("/comments", commentRouter);
 
 export default app;
