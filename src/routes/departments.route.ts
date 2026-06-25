@@ -52,13 +52,6 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 router.post("/",sessionMiddleware, profileRequiredMiddleware, validateDepartmentData, async (req: Request, res: Response) => {
-    const { user } = req;
-    if (!user || !user.uid)
-      return res.status(401).json({
-        error: "missing_bearer_token",
-        message: "Unauthorized",
-      });
-
     try {
       const department = await Department.create({
         name: req.body.name,
@@ -79,13 +72,6 @@ router.post("/",sessionMiddleware, profileRequiredMiddleware, validateDepartment
 );
 
 router.put("/:id",sessionMiddleware, profileRequiredMiddleware, validateDepartmentData, async (req: Request, res: Response) => {
-    const { user } = req;
-    if (!user || !user.uid)
-      return res.status(401).json({
-        error: "missing_bearer_token",
-        message: "Unauthorized",
-      });
-
     try {
       const department = await Department.findByPk(req.params.id);
 

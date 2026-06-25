@@ -64,14 +64,6 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 router.post("/",sessionMiddleware, profileRequiredMiddleware, validateCommentData, async (req: Request, res: Response) => {
-    const { user } = req;
-
-    if (!user || !user.uid)
-      return res.status(401).json({
-        error: "missing_bearer_token",
-        message: "Unauthorized",
-      });
-
     try {
       const comment = await Comment.create({
         noteId: req.body.noteId,
@@ -95,14 +87,6 @@ router.post("/",sessionMiddleware, profileRequiredMiddleware, validateCommentDat
 );
 
 router.put("/:id",sessionMiddleware, profileRequiredMiddleware, validateCommentData, async (req: Request, res: Response) => {
-    const { user } = req;
-
-    if (!user || !user.uid)
-      return res.status(401).json({
-        error: "missing_bearer_token",
-        message: "Unauthorized",
-      });
-
     try {
       const comment = await Comment.findByPk(req.params.id);
 
