@@ -51,3 +51,4 @@ export class Resource extends Model<
   @HasMany(() => Download, "recursoid")
   declare downloads: NonAttribute<Download[]>;
 }
+

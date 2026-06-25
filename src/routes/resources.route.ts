@@ -10,34 +10,8 @@ import { sessionMiddleware } from "../middlewares/session.middleware.js";
 import { Resource } from "../models/resource.model.js";
 import { Note } from "../models/note.model.js";
 import s3Bucket from "../services/s3_bucket.service.js";
+import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
 
-
-const validateResourceData = [
-  body("noteId")
-    .isInt({ min: 1 })
-    .withMessage("noteId must be a positive integer"),
-  body("name")
-    .trim()
-    .notEmpty()
-    .withMessage("Name is required")
-    .isString()
-    .withMessage("Name must be a string"),
-  body("url")
-    .trim()
-    .notEmpty()
-    .withMessage("URL is required")
-    .isString()
-    .withMessage("URL must be a string")
-    .isURL()
-    .withMessage("URL must be a valid URL"),
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  }
-];
 const validatePresignData = [
   body("noteId")
     .isInt({ min: 1 })
@@ -73,6 +47,8 @@ router.get("/", async (_req: Request, res: Response) => {
 router.post(
   "/presign",
   sessionMiddleware,
+  profileRequiredMiddleware,
+  validatePresignData,
   async (req: Request, res: Response) => {
     const { noteId, filename, contentType } = req.body;
 
@@ -126,3 +102,4 @@ router.post(
     }
   },
 );
+

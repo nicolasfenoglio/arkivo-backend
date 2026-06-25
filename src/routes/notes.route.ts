@@ -7,8 +7,7 @@ import {
 import { body, validationResult } from "express-validator";
 import { Note } from "../models/note.model.js";
 import { Profile } from "../models/profile.model.js";
-import { sessionMiddleware } from "../middlewares/session.middleware.js";
-
+import { sessionMiddleware } from "../middlewares/session.middleware.js";   
 const validateNoteData = [
   body("subjectId")
     .isInt({ min: 1 })
