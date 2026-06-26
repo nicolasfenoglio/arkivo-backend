@@ -7,11 +7,12 @@ import { Resource } from "./resource.model.js";
 import { Download } from "./download.model.js";
 import { Comment } from "./comment.model.js";
 import { Report } from "./report.model.js";
+import { Department } from "./department.model.js";
 
 const sequelize = new Sequelize({
   dialect: PostgresDialect,
   url: process.env.DATABASE_URL,
-  models: [Profile, Subject, Note, Resource, Download, Comment, Report],
+  models: [Profile, Subject, Note, Resource, Download, Comment, Report, Department],
 });
 
 export default sequelize;
