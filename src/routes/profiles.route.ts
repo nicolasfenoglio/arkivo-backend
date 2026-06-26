@@ -12,6 +12,9 @@ import {
   type FindAttributeOptions,
   type InferAttributes,
 } from "@sequelize/core";
+import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
+import { Download } from "../models/download.model.js";
+import { Resource } from "../models/resource.model.js";
 
 const validateProfileData = [
   body("username")
@@ -181,6 +184,43 @@ router.put(
         message: "Internal server error",
       });
     }
+  },
+);
+
+router.get(
+  "/@me/downloads",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  async (req: Request, res: Response) => {
+    const { user, profile } = req;
+    if (!user || !user.uid)
+      return res.status(401).json({
+        error: "missing_bearer_token",
+        message: "Unauthorized",
+      });
+
+    if (!profile) {
+      return res.status(404).json({
+        error: "not_found",
+        message: "Profile not found",
+      });
+    }
+
+    const downloads = await Download.findAll({
+      where: {
+        perfilid: profile.id,
+      },
+      attributes: ["id"],
+      include: [
+        {
+          model: Resource,
+          as: "resource",
+          attributes: ["id", "filename"],
+        },
+      ],
+    });
+
+    return res.json(downloads);
   },
 );
 

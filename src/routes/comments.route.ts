@@ -5,7 +5,7 @@ import {
   type Response,
 } from "express";
 import { Comment } from "../models/comment.model.js";
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
 import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
 
@@ -15,20 +15,17 @@ const validateCommentData = [
     .withMessage("noteId is required")
     .isInt()
     .withMessage("noteId must be an integer"),
-
   body("valoration")
     .notEmpty()
     .withMessage("Valoration is required")
     .isInt()
     .withMessage("Valoration must be an integer"),
-
   body("message")
     .trim()
     .notEmpty()
     .withMessage("Message is required")
     .isString()
     .withMessage("Message must be a string"),
-
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 
@@ -44,13 +41,22 @@ const validateCommentData = [
 
 const router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
-  const comments = await Comment.findAll();
+const validateidParam = [
+  param("id").isInt({ min: 1 }).withMessage("Id must be a positive integer"),
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
 
-  return res.json(comments);
-});
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    }
 
-router.get("/:id", async (req: Request, res: Response) => {
+    next();
+  },
+];
+
+router.get("/:id", validateidParam, async (req: Request, res: Response) => {
   const comment = await Comment.findByPk(req.params.id);
 
   if (!comment) {
@@ -63,7 +69,12 @@ router.get("/:id", async (req: Request, res: Response) => {
   return res.json(comment);
 });
 
-router.post("/",sessionMiddleware, profileRequiredMiddleware, validateCommentData, async (req: Request, res: Response) => {
+router.post(
+  "/",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  validateCommentData,
+  async (req: Request, res: Response) => {
     try {
       const comment = await Comment.create({
         noteId: req.body.noteId,
@@ -86,7 +97,12 @@ router.post("/",sessionMiddleware, profileRequiredMiddleware, validateCommentDat
   },
 );
 
-router.put("/:id",sessionMiddleware, profileRequiredMiddleware, validateCommentData, async (req: Request, res: Response) => {
+router.put(
+  "/:id",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  validateCommentData,
+  async (req: Request, res: Response) => {
     try {
       const comment = await Comment.findByPk(req.params.id);
 

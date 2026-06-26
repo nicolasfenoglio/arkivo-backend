@@ -58,7 +58,14 @@ router.get("/", async (_req: Request, res: Response) => {
     where: {
       visible: true,
     },
-    raw: true,
+    attributes: ["id", "name", "description"],
+    include: [
+      {
+        model: Profile,
+        as: "author",
+        attributes: ["firstName", "lastName"],
+      },
+    ],
   });
 
   return res.json(notes);

@@ -11,12 +11,11 @@ import {
   PrimaryKey,
   AutoIncrement,
   NotNull,
-  HasOne,
   HasMany,
+  BelongsTo,
 } from "@sequelize/core/decorators-legacy";
 import { Profile } from "./profile.model.js";
 import { Comment } from "./comment.model.js";
-import { Subject } from "./subject.model.js";
 import { Resource } from "./resource.model.js";
 import { Report } from "./report.model.js";
 
@@ -32,6 +31,9 @@ export class Note extends Model<
   @Attribute(DataTypes.INTEGER)
   @NotNull
   declare authorId: CreationOptional<number>;
+
+  @BelongsTo(() => Profile, "authorId")
+  declare author: NonAttribute<Profile>;
 
   @Attribute(DataTypes.INTEGER)
   @NotNull

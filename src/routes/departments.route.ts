@@ -5,9 +5,10 @@ import {
   type Response,
 } from "express";
 import { Department } from "../models/department.model.js";
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
 import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
+import { Subject } from "../models/subject.model.js";
 
 const validateDepartmentData = [
   body("name")
@@ -16,7 +17,6 @@ const validateDepartmentData = [
     .withMessage("Name is required")
     .isString()
     .withMessage("Name must be a string"),
-
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 
@@ -25,7 +25,6 @@ const validateDepartmentData = [
         errors: errors.array(),
       });
     }
-
     next();
   },
 ];
@@ -33,13 +32,31 @@ const validateDepartmentData = [
 const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
-  const departments = await Department.findAll();
+  const departments = await Department.findAll({
+    attributes: ["id", "name"],
+  });
 
   return res.json(departments);
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
-  const department = await Department.findByPk(req.params.id);
+const validateIdParam = [
+  param("id").isInt({ min: 1 }).withMessage("Id must be a positive integer"),
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    }
+    next();
+  },
+];
+
+router.get("/:id", validateIdParam, async (req: Request, res: Response) => {
+  const department = await Department.findByPk(req.params.id, {
+    include: [{ model: Subject, attributes: ["id", "name", "level"] }],
+  });
 
   if (!department) {
     return res.status(404).json({
@@ -51,7 +68,12 @@ router.get("/:id", async (req: Request, res: Response) => {
   return res.json(department);
 });
 
-router.post("/",sessionMiddleware, profileRequiredMiddleware, validateDepartmentData, async (req: Request, res: Response) => {
+router.post(
+  "/",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  validateDepartmentData,
+  async (req: Request, res: Response) => {
     try {
       const department = await Department.create({
         name: req.body.name,
@@ -71,7 +93,13 @@ router.post("/",sessionMiddleware, profileRequiredMiddleware, validateDepartment
   },
 );
 
-router.put("/:id",sessionMiddleware, profileRequiredMiddleware, validateDepartmentData, async (req: Request, res: Response) => {
+router.put(
+  "/:id",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  validateDepartmentData,
+  validateIdParam,
+  async (req: Request, res: Response) => {
     try {
       const department = await Department.findByPk(req.params.id);
 

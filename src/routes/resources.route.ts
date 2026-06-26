@@ -10,6 +10,7 @@ import { Resource } from "../models/resource.model.js";
 import { Note } from "../models/note.model.js";
 import s3Bucket from "../services/s3_bucket.service.js";
 import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
+import { Download } from "../models/download.model.js";
 
 const validatePresignData = [
   param("noteId")
@@ -91,6 +92,11 @@ router.get(
     const downloadUrl = await s3Bucket.generateDownloadUrl({
       key: resource.key,
     });
+
+    void Download.create({
+      perfilid: req.profile!.id,
+      recursoid: Number(resource.id),
+    }).catch(console.error);
 
     return res.status(200).json({ downloadUrl });
   },
