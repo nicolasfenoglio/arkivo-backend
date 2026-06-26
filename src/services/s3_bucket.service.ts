@@ -24,8 +24,6 @@ const BUCKET = process.env.S3_BUCKET!;
 
 interface UploadUrlOptions {
   noteUid: number;
-  filename: string;
-  contentType: string;
   expiresIn?: number;
 }
 
@@ -41,8 +39,7 @@ interface DownloadUrlOptions {
 
 class S3BucketService {
   buildResourceKey(noteUid: number): string {
-    const id = crypto.randomUUID();
-    return `notes/${noteUid}/${id}`;
+    return `notes/${noteUid}/${crypto.randomUUID()}`;
   }
 
   async generateUploadUrl({

@@ -29,8 +29,7 @@ export class Resource extends Model<
   declare noteId: CreationOptional<number>;
 
   @Attribute(DataTypes.STRING)
-  @NotNull
-  declare key: string;
+  declare key?: string;
 
   @Attribute(DataTypes.STRING)
   @NotNull
@@ -39,4 +38,3 @@ export class Resource extends Model<
   @HasMany(() => Download, "recursoid")
   declare downloads: NonAttribute<Download[]>;
 }
-

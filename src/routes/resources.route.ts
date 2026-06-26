@@ -15,18 +15,6 @@ const validatePresignData = [
   param("noteId")
     .isInt({ min: 1 })
     .withMessage("noteId must be a positive integer"),
-  body("filename")
-    .trim()
-    .notEmpty()
-    .withMessage("Filename is required")
-    .isString()
-    .withMessage("Filename must be a string"),
-  body("contentType")
-    .trim()
-    .notEmpty()
-    .withMessage("contentType is required")
-    .isString()
-    .withMessage("contenType must be a string"),
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -93,6 +81,13 @@ router.get(
       });
     }
 
+    if (!resource.key) {
+      return res.status(404).json({
+        error: "not_found",
+        message: "Resource not found",
+      });
+    }
+
     const downloadUrl = await s3Bucket.generateDownloadUrl({
       key: resource.key,
     });
@@ -101,56 +96,101 @@ router.get(
   },
 );
 
+const validateCreateResource = [
+  param("noteId")
+    .isInt({ min: 1 })
+    .withMessage("noteId must be a positive integer"),
+  body("filename")
+    .trim()
+    .notEmpty()
+    .withMessage("Filename is required")
+    .isString()
+    .withMessage("Filename must be a string"),
+  body("contentType")
+    .trim()
+    .notEmpty()
+    .withMessage("contentType is required")
+    .isString()
+    .withMessage("contenType must be a string"),
+];
+
 router.post(
-  "/presign/:noteId",
+  "/:noteId",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  validateCreateResource,
+  async (req: Request, res: Response) => {
+    const { noteId } = req.params;
+    const { filename, key } = req.body;
+
+    const note = await Note.findOne({
+      where: {
+        id: noteId,
+        authorId: req.profile!.id,
+      },
+    });
+
+    if (!note) {
+      return res.status(404).json({
+        error: "not_found",
+        message: "Note not found",
+      });
+    }
+
+    if (!key.startsWith(`notes/${note.id}/`)) {
+      return res.status(400).json({
+        error: "invalid_key",
+        message: "Invalid resource key",
+      });
+    }
+
+    if (!(await s3Bucket.exists(key))) {
+      return res.status(400).json({
+        error: "upload_not_found",
+        message: "The file has not been uploaded",
+      });
+    }
+
+    const resource = await Resource.create({
+      noteId: Number(noteId),
+      fileName: filename,
+      key,
+    });
+
+    return res.status(201).json(resource);
+  },
+);
+
+router.post(
+  "/:noteId/presign",
   sessionMiddleware,
   profileRequiredMiddleware,
   validatePresignData,
   async (req: Request, res: Response) => {
     const { noteId } = req.params;
-    const { filename, contentType } = req.body;
 
-    if (!filename || !contentType) {
-      return res.status(400).json({
-        error: "invalid_request",
-        message: "noteId, filename and contentType are required",
+    const note = await Note.findOne({
+      where: {
+        id: noteId,
+        authorId: req.profile!.id,
+      },
+    });
+
+    if (!note) {
+      return res.status(404).json({
+        error: "not_found",
+        message: "Note not found",
       });
     }
 
-    try {
-      const note = await Note.findOne({
-        where: {
-          id: noteId,
-          authorId: req.profile!.id,
-        },
-      });
-      if (!note) {
-        return res.status(404).json({
-          error: "not_found",
-          message: "Note not found",
-        });
-      }
+    const { uploadUrl, key } = await s3Bucket.generateUploadUrl({
+      noteUid: note.id,
+    });
 
-      const { key, uploadUrl } = await s3Bucket.generateUploadUrl({
-        noteUid: note.id,
-        filename,
-        contentType,
-      });
-
-      await Resource.create({
-        key: key,
-        fileName: filename,
-        noteId: note.id,
-      });
-
-      return res.status(200).json({ key, uploadUrl });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        error: "internal_server_error",
-        message: "Internal server error",
-      });
-    }
+    return res.json({
+      uploadUrl,
+      key,
+    });
   },
 );
 

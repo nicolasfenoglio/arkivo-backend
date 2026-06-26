@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: "{{BASE_URL}}/resources/presign/:noteId"
+  url: "{{BASE_URL}}/resources/presign/:noteId/"
   headers:
     - name: Authorization
       value: Bearer {{AccessToken}}
@@ -27,7 +27,7 @@ runtime:
     - type: after-response
       code: |-
         if (res.status === 200) {
-          bru.setVar("UploadLink", res.body["uploadUrl"])
+          const uploadUrl = res.body.uploadUrl;
         }
 
 settings:
