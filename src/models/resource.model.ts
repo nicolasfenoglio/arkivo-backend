@@ -12,8 +12,10 @@ import {
   AutoIncrement,
   NotNull,
   HasMany,
+  BelongsTo,
 } from "@sequelize/core/decorators-legacy";
 import { Download } from "./download.model.js";
+import { Note } from "./note.model.js";
 
 export class Resource extends Model<
   InferAttributes<Resource>,
@@ -26,27 +28,17 @@ export class Resource extends Model<
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
-  declare apunteid: CreationOptional<number>;
+  declare noteId: CreationOptional<number>;
 
-  @Attribute(DataTypes.INTEGER)
-  @NotNull
-  declare materiaid: number;
+  @BelongsTo(() => Note, "noteId")
+  declare note: NonAttribute<Note>;
+
+  @Attribute(DataTypes.STRING)
+  declare key?: string;
 
   @Attribute(DataTypes.STRING)
   @NotNull
-  declare url: string;
-
-  @Attribute(DataTypes.STRING)
-  @NotNull
-  declare extension: string;
-
-  @Attribute(DataTypes.INTEGER)
-  @NotNull
-  declare tamanioBytes: number;
-
-  @Attribute(DataTypes.STRING)
-  @NotNull
-  declare nombreOriginal: string;
+  declare fileName: string;
 
   @HasMany(() => Download, "recursoid")
   declare downloads: NonAttribute<Download[]>;

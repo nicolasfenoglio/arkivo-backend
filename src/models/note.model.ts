@@ -13,6 +13,7 @@ import {
   NotNull,
   HasOne,
   HasMany,
+  BelongsTo,
 } from "@sequelize/core/decorators-legacy";
 import { Profile } from "./profile.model.js";
 import { Comment } from "./comment.model.js";
@@ -35,9 +36,15 @@ export class Note extends Model<
   @NotNull
   declare authorId: CreationOptional<number>;
 
+  @BelongsTo(() => Profile, "authorId")
+  declare author: NonAttribute<Profile>;
+
   @Attribute(DataTypes.INTEGER)
   @NotNull
   declare subjectId: number;
+
+  @BelongsTo(() => Subject, "subjectId")
+  declare subject: NonAttribute<Subject>;
 
   @Attribute(DataTypes.STRING)
   @NotNull
@@ -62,7 +69,7 @@ export class Note extends Model<
   @HasMany(() => Comment, "noteId")
   declare comments: NonAttribute<Comment[]>;
 
-  @HasMany(() => Resource, "apunteid")
+  @HasMany(() => Resource, "noteId")
   declare resources: NonAttribute<Resource[]>;
 
   @HasMany(() => Report, "noteId")

@@ -36,4 +36,5 @@ export class Report extends Model<
   @Attribute(DataTypes.STRING)
   @NotNull
   declare state: string;
+  
 }
