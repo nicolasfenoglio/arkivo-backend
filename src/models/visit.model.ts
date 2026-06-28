@@ -1,26 +1,23 @@
 import {
-  Sequelize,
   DataTypes,
   Model,
   type InferAttributes,
   type InferCreationAttributes,
   type CreationOptional,
-  type NonAttribute,
 } from "@sequelize/core";
 import {
   Attribute,
   PrimaryKey,
   AutoIncrement,
   NotNull,
-  Unique,
   BelongsTo,
 } from "@sequelize/core/decorators-legacy";
 import { Profile } from "./profile.model.js";
 import { Note } from "./note.model.js";
 
-export class Comment extends Model<
-  InferAttributes<Comment>,
-  InferCreationAttributes<Comment>
+export class Visit extends Model<
+  InferAttributes<Visit>,
+  InferCreationAttributes<Visit>
 > {
   @Attribute(DataTypes.INTEGER)
   @PrimaryKey
@@ -29,23 +26,15 @@ export class Comment extends Model<
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
-  declare noteId: number;
+  declare noteId: CreationOptional<number>;
 
   @BelongsTo(() => Note, "noteId")
-  declare note: NonAttribute<Note>;
+  declare note: CreationOptional<Note>;
 
   @Attribute(DataTypes.INTEGER)
   @NotNull
-  declare authorId: number;
+  declare profileId: number;
 
-  @BelongsTo(() => Profile, "authorId")
-  declare author: NonAttribute<Profile>;
-
-  @Attribute(DataTypes.INTEGER)
-  @NotNull
-  declare valoration: number;
-
-  @Attribute(DataTypes.STRING)
-  @NotNull
-  declare message: string;
+  @BelongsTo(() => Profile, "profileId")
+  declare profile: CreationOptional<Profile>;
 }
