@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import profileRouter from "./routes/profiles.route.js";
 import notesRouter from "./routes/notes.route.js";
-import subjectsRouter from "./routes/Subjects.route.js";
+import subjectsRouter from "./routes/subjects.route.js";
 import resourcesRouter from "./routes/resources.route.js";
 import departmentRouter from "./routes/departments.route.js";
 import commentRouter from "./routes/comments.route.js";

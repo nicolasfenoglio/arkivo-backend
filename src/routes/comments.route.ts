@@ -63,30 +63,12 @@ router.get("/:id", async (req: Request, res: Response) => {
   return res.json(comment);
 });
 
-router.post("/",sessionMiddleware, profileRequiredMiddleware, validateCommentData, async (req: Request, res: Response) => {
-    try {
-      const comment = await Comment.create({
-        noteId: req.body.noteId,
-        authorId: req.profile!.id,
-        valoration: req.body.valoration,
-        message: req.body.message,
-      });
-
-      return res.status(201).json({
-        id: comment.id,
-      });
-    } catch (error) {
-      console.error(error);
-
-      return res.status(500).json({
-        error: "internal_server_error",
-        message: "Internal server error",
-      });
-    }
-  },
-);
-
-router.put("/:id",sessionMiddleware, profileRequiredMiddleware, validateCommentData, async (req: Request, res: Response) => {
+router.put(
+  "/:id",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  validateCommentData,
+  async (req: Request, res: Response) => {
     try {
       const comment = await Comment.findByPk(req.params.id);
 

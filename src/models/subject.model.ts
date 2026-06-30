@@ -12,8 +12,10 @@ import {
   AutoIncrement,
   NotNull,
   HasMany,
+  BelongsTo,
 } from "@sequelize/core/decorators-legacy";
 import { Note } from "./note.model.js";
+import { Department } from "./department.model.js";
 
 export class Subject extends Model<
   InferAttributes<Subject>,
@@ -31,6 +33,9 @@ export class Subject extends Model<
   @Attribute(DataTypes.INTEGER)
   @NotNull
   declare departmentid: number;
+
+  @BelongsTo(() => Department, "departmentid")
+  declare department: NonAttribute<Department>;
 
   @Attribute(DataTypes.INTEGER)
   @NotNull

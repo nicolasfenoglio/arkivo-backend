@@ -4,16 +4,18 @@ import {
   type Response,
   type NextFunction,
 } from "express";
-import { body, query, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 import { Note } from "../models/note.model.js";
 import { Profile } from "../models/profile.model.js";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
 import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
 
-import { literal, type Order } from "@sequelize/core";
+import { col, fn, literal, type Order } from "@sequelize/core";
 import { Comment } from "../models/comment.model.js";
 import { Subject } from "../models/subject.model.js";
 import { Visit } from "../models/visit.model.js";
+import { Resource } from "../models/resource.model.js";
+import { Department } from "../models/department.model.js";
 
 const validateNoteData = [
   body("subjectId")
@@ -87,27 +89,15 @@ router.get("/", validateRequestParams, async (req: Request, res: Response) => {
   switch (sort) {
     case "rating":
       order = [
-        [
-          literal(`(
-          SELECT AVG(c.valoration)
-          FROM "Comments" c
-          WHERE c."noteId" = "Note".id
-        )`),
-          "DESC",
-        ],
+        [col("rating"), "DESC"],
+        ["id", "DESC"], // desempate
       ];
       break;
 
     case "visits":
       order = [
-        [
-          literal(`(
-          SELECT COUNT(*)
-          FROM "Visits" v
-          WHERE v."noteId" = "Note".id
-        )`),
-          "DESC",
-        ],
+        [col("visitsCount"), "DESC"],
+        ["id", "DESC"],
       ];
       break;
 
@@ -123,24 +113,21 @@ router.get("/", validateRequestParams, async (req: Request, res: Response) => {
     attributes: [
       "id",
       "name",
-      "description",
       [
         literal(
-          `(SELECT COUNT(*) FROM \"Comments\" c WHERE c."noteId" = \"Note\".id)`,
+          `(SELECT COUNT(*) FROM "Comments" c WHERE c."noteId" = "Note".id)`,
         ),
         "commentsCount",
       ],
-
       [
         literal(
-          `(SELECT AVG(c.valoration) FROM \"Comments\" c WHERE c."noteId" = \"Note\".id)`,
+          `(SELECT COALESCE(AVG(c.valoration), 0) FROM "Comments" c WHERE c."noteId" = "Note".id)`,
         ),
         "rating",
       ],
-
       [
         literal(
-          `(SELECT COUNT(*) FROM \"Visits\" v WHERE v."noteId" = \"Note\".id)`,
+          `(SELECT COUNT(*) FROM "Visits" v WHERE v."noteId" = "Note".id)`,
         ),
         "visitsCount",
       ],
@@ -161,6 +148,12 @@ router.get("/", validateRequestParams, async (req: Request, res: Response) => {
             departmentid: Number(departmentId),
           },
         }),
+      },
+      {
+        model: Comment,
+        as: "comments",
+        attributes: [],
+        required: false,
       },
     ],
     group: ["Note.id", "author.id", "subject.id"],
@@ -237,7 +230,7 @@ router.get(
         {
           model: Comment,
           as: "comments",
-          attributes: ["id", "valoration", "message"],
+          attributes: ["id", "valoration", "message", "createdAt"],
           include: [
             {
               model: Profile,
@@ -245,6 +238,24 @@ router.get(
               attributes: ["id", "firstName", "lastName"],
             },
           ],
+        },
+        {
+          model: Subject,
+          as: "subject",
+          attributes: ["id", "name", "departmentid"],
+          required: true,
+          include: [
+            {
+              model: Department,
+              as: "department",
+              attributes: ["name"],
+            },
+          ],
+        },
+        {
+          model: Resource,
+          as: "resources",
+          attributes: ["id", "fileName"],
         },
       ],
     });
@@ -427,6 +438,63 @@ router.delete(
 
       await note.destroy();
       return res.status(204).send();
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        error: "internal_server_error",
+        message: "Internal server error",
+      });
+    }
+  },
+);
+
+const validateCommentData = [
+  param("noteId")
+    .notEmpty()
+    .withMessage("noteId is required")
+    .isInt({ min: 1 })
+    .withMessage("noteId must be a positive integer"),
+  body("valoration")
+    .notEmpty()
+    .withMessage("Valoration is required")
+    .isInt({ min: 1, max: 5 })
+    .withMessage("Valoration must be an integer"),
+  body("message")
+    .trim()
+    .notEmpty()
+    .withMessage("Message is required")
+    .isString()
+    .withMessage("Message must be a string"),
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    }
+
+    next();
+  },
+];
+
+router.post(
+  "/:noteId/comment",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  validateCommentData,
+  async (req: Request, res: Response) => {
+    try {
+      const comment = await Comment.create({
+        noteId: Number(req.params.noteId),
+        authorId: req.profile!.id,
+        valoration: req.body.valoration,
+        message: req.body.message,
+      });
+
+      return res.status(201).json({
+        id: comment.id,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({
