@@ -4,7 +4,7 @@ import {
   type Response,
   type NextFunction,
 } from "express";
-import { body, validationResult } from "express-validator";
+import { body, query, validationResult } from "express-validator";
 import { Note } from "../models/note.model.js";
 import { Profile } from "../models/profile.model.js";
 import { sessionMiddleware } from "../middlewares/session.middleware.js";
@@ -58,7 +58,29 @@ const validateNoteData = [
 
 const router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
+const validateRequestParams = [
+  query("departmentId")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("departmentId must be a positive integer"),
+  query("subjectId")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("subjectId must be a positive integer"),
+  query("sort")
+    .optional()
+    .isIn(["rating", "visits"])
+    .withMessage("sort must be rating or visits"),
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
+router.get("/", validateRequestParams, async (req: Request, res: Response) => {
   const { departmentId, subjectId, sort } = req.query;
 
   let order: Order;
