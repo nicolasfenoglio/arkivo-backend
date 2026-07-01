@@ -47,11 +47,24 @@ router.get("/:noteId", async (req: Request, res: Response) => {
   res.status(200).json(resources);
 });
 
+const validateDownloadDate = [
+  param("id")
+    .isInt({ min: 1 })
+    .withMessage("resourceId must be a positive integer"),
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
 router.get(
   "/download/:id",
   sessionMiddleware,
   profileRequiredMiddleware,
-  validatePresignData,
+  validateDownloadDate,
   async (req: Request, res: Response) => {
     const { id } = req.params;
     const resource = await Resource.findByPk(id, { raw: true });
