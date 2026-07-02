@@ -63,6 +63,42 @@ router.get("/:id", async (req: Request, res: Response) => {
   return res.json(comment);
 });
 
+router.delete(
+  "/:id",
+  sessionMiddleware,
+  profileRequiredMiddleware,
+  async (req: Request, res: Response) => {
+    try {
+      const comment = await Comment.findOne({
+        where: {
+          id: req.params.id,
+          authorId: req.profile?.id,
+        },
+      });
+
+      if (!comment) {
+        return res.status(404).json({
+          error: "not_found",
+          message: "Comment not found",
+        });
+      }
+
+      await comment.destroy();
+
+      return res.json({
+        message: "Comment deleted successfully",
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        error: "internal_server_error",
+        message: "Internal server error",
+      });
+    }
+  },
+);
+
 router.put(
   "/:id",
   sessionMiddleware,
@@ -70,7 +106,12 @@ router.put(
   validateCommentData,
   async (req: Request, res: Response) => {
     try {
-      const comment = await Comment.findByPk(req.params.id);
+      const comment = await Comment.findOne({
+        where: {
+          id: req.params.id,
+          authorId: req.profile?.id,
+        },
+      });
 
       if (!comment) {
         return res.status(404).json({
