@@ -13,6 +13,7 @@ import {
   NotNull,
   Unique,
   HasMany,
+  Default,
 } from "@sequelize/core/decorators-legacy";
 import { Comment } from "./comment.model.js";
 import { Download } from "./download.model.js";
@@ -48,6 +49,10 @@ export class Profile extends Model<
 
   @Attribute(DataTypes.STRING)
   declare lastName: string | null;
+
+  @Attribute(DataTypes.STRING)
+  @Default("/default.webp")
+  declare avatarKey: string | null;
 
   @HasMany(() => Comment, "authorId")
   declare comments: NonAttribute<Comment[]>;

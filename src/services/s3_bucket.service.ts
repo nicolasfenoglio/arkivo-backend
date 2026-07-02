@@ -42,6 +42,10 @@ class S3BucketService {
     return `notes/${noteUid}/${crypto.randomUUID()}`;
   }
 
+  buildAvatarKey(id: number): string {
+    return `avatars/${id}/${crypto.randomUUID()}.webp`;
+  }
+
   async generateUploadUrl({
     noteUid,
     expiresIn = 900,
@@ -51,6 +55,32 @@ class S3BucketService {
     const command = new PutObjectCommand({
       Bucket: BUCKET,
       Key: key,
+    });
+
+    const uploadUrl = await getSignedUrl(client, command, {
+      expiresIn,
+    });
+
+    return {
+      key,
+      uploadUrl,
+    };
+  }
+
+  async generateUploadAvatarUrl({
+    id,
+    expiresIn = 900,
+  }: {
+    id: number;
+    expiresIn?: number;
+  }) {
+    const key = this.buildAvatarKey(id);
+
+    const command = new PutObjectCommand({
+      Bucket: "public",
+      Key: key,
+      ContentType: "image/webp",
+      CacheControl: "public, max-age=31536000",
     });
 
     const uploadUrl = await getSignedUrl(client, command, {
@@ -77,11 +107,11 @@ class S3BucketService {
     });
   }
 
-  async exists(key: string): Promise<boolean> {
+  async exists(key: string, bucket: string = BUCKET): Promise<boolean> {
     try {
       await client.send(
         new HeadObjectCommand({
-          Bucket: BUCKET,
+          Bucket: bucket,
           Key: key,
         }),
       );

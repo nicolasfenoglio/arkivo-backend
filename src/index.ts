@@ -1,7 +1,8 @@
 import "dotenv/config";
 import app from "./app.js";
 import { initializeApp, applicationDefault } from "firebase-admin";
-import sequalize from "./models/index.js";
+import sequelize from "./models/index.js";
+import { Department } from "./models/department.model.js";
 
 [
   "S3_ENDPOINT",
@@ -23,8 +24,33 @@ initializeApp({
   credential: applicationDefault(),
 });
 
-sequalize.sync({ alter: true });
+const DEFAULT_DEPARTMENTS = [
+  { name: "Materias Basicas" },
+  { name: "Ingeniería en Sistemas de Información" },
+  { name: "Ingeniería Industrial" },
+  { name: "Ingeniería Eléctrica" },
+  { name: "Ingeniería Mecánica" },
+  { name: "Ingeniería Química" },
+];
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+async function seedDepartments() {
+  const count = await Department.count();
+  if (count > 0) return;
+
+  await Department.bulkCreate(DEFAULT_DEPARTMENTS);
+  console.log(`Seeded ${DEFAULT_DEPARTMENTS.length} departments.`);
+}
+
+async function bootstrap() {
+  await sequelize.sync({ alter: true });
+  await seedDepartments();
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+bootstrap().catch((error) => {
+  console.error("Failed to start the server:", error);
+  process.exit(1);
 });

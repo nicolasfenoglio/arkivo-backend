@@ -32,7 +32,11 @@ const validateNoteData = [
     .notEmpty()
     .withMessage("Description is required")
     .isString()
-    .withMessage("Description must be a string"),
+    .withMessage("Description must be a string")
+    .isLength({ min: 5, max: 250 })
+    .withMessage(
+      "Description must be longer than 5 characters and shorter than 250.",
+    ),
   body("keywords")
     .trim()
     .notEmpty()
@@ -136,7 +140,7 @@ router.get("/", validateRequestParams, async (req: Request, res: Response) => {
       {
         model: Profile,
         as: "author",
-        attributes: ["firstName", "lastName"],
+        attributes: ["id", "firstName", "lastName"],
       },
       {
         model: Subject,
@@ -225,7 +229,7 @@ router.get(
         {
           model: Profile,
           as: "author",
-          attributes: ["id", "firstName", "lastName"],
+          attributes: ["id", "firstName", "lastName", "avatarKey"],
         },
         {
           model: Comment,
@@ -235,7 +239,7 @@ router.get(
             {
               model: Profile,
               as: "author",
-              attributes: ["id", "firstName", "lastName"],
+              attributes: ["id", "firstName", "lastName", "avatarKey"],
             },
           ],
         },
