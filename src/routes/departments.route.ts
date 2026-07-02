@@ -6,21 +6,21 @@ import {
 } from "express";
 import { Department } from "../models/department.model.js";
 import { body, validationResult } from "express-validator";
-import { sessionMiddleware } from "../middlewares/session.middleware.js";
-import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js";
+import { sessionMiddleware } from "../middlewares/session.middleware.js"; //verifica que el usuario esté autenticado
+import profileRequiredMiddleware from "../middlewares/profile-required.middleware.js"; //verifica que el usuario tenga un perfil creado
 
 const validateDepartmentData = [
   body("name")
-    .trim()
-    .notEmpty()
-    .withMessage("Name is required")
-    .isString()
-    .withMessage("Name must be a string"),
+    .trim() //elimina espacios al principio y al final
+    .notEmpty() //verifica que no esté vacío
+    .withMessage("Name is required") //mensaje que devuelve si falla la validación
+    .isString() //verifica que sea texto
+    .withMessage("Name must be a string"), //mensaje si no es texto
 
   (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
+    const errors = validationResult(req); //obtiene los errores encontrados
 
-    if (!errors.isEmpty()) {
+    if (!errors.isEmpty()) { //si la lista de errores no esta vacia?
       return res.status(400).json({
         errors: errors.array(),
       });
@@ -30,7 +30,7 @@ const validateDepartmentData = [
   },
 ];
 
-const router = Router();
+const router = Router(); //crea el objeto donde se van a registrar las rutas
 
 router.get("/", async (req: Request, res: Response) => {
   const departments = await Department.findAll();
